@@ -27,4 +27,8 @@ test("User should be able to login with valid credentials and add product to car
 
     const bool = await page.locator("h3:has-text('ZARA COAT 3')").isVisible();
     expect(bool).toBeTruthy();
+
+    page.locator("text = Checkout").click();
+
+    
 })
