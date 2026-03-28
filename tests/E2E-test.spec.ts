@@ -1,10 +1,11 @@
 import {test, expect} from "@playwright/test";
 
 test("User should be able to login with valid credentials and add product to cart", async ({page})=>{
+    const email = "ush@gmail.com";
     await page.goto("https://rahulshettyacademy.com/client",{
         waitUntil: "networkidle"
     });
-    await page.locator("#userEmail").fill("ush@gmail.com");
+    await page.locator("#userEmail").fill(email);
     await page.locator("#userPassword").fill("Usha@1234");
     await page.locator("#login").click();
     
@@ -12,7 +13,7 @@ test("User should be able to login with valid credentials and add product to car
 
     await page.waitForLoadState("networkidle");
 
-    const productCards = await page.locator('.card-body');
+    const productCards = page.locator('.card-body');
 
     for(let i=0;i < await productCards.count();i++){
         const title = await productCards.nth(i).locator("h5 b").textContent();
@@ -50,6 +51,36 @@ test("User should be able to login with valid credentials and add product to car
         }
     }
 
+    await expect( page.locator(".user__name [type='text']").first()).toHaveText(email);
+
     await page.locator("text=Place Order ").click();
+
+    await expect( page.locator(".hero-primary")).toHaveText(" Thankyou for the order. ");
+
+    const orderId = await page.locator(".em-spacer-1 .ng-star-inserted").textContent();
+    console.log(orderId);
+
+    // to verify order in order history
+
+    await page.locator("button[routerLink*='myorders']").click();
+
+    await page.locator("tbody").waitFor();
+
+    const rows = page.locator(".table.table-hover tbody tr");
+
+    const rowCount = await rows.count();
+
+    console.log("Total rows in order history: " + rowCount);
+
+    for(let i=0;i<rowCount;i++){
+        const cellText = await rows.nth(i).locator("th").textContent();
+        console.log(cellText);
+        if(orderId && cellText && orderId.includes(cellText)){
+            console.log("Order found in order history");
+            await rows.nth(i).locator("button").first().click();
+            break;
+        }
+    }
+
     
 })
