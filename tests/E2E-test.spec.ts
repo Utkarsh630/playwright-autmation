@@ -1,68 +1,89 @@
-import {test, expect} from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-test("User should be able to login with valid credentials and add product to cart", async ({page})=>{
-    const email = "ush@gmail.com";
-    await page.goto("https://rahulshettyacademy.com/client",{
-        waitUntil: "networkidle"
-    });
-    await page.locator("#userEmail").fill(email);
-    await page.locator("#userPassword").fill("Usha@1234");
-    await page.locator("#login").click();
-    
-    await expect(page.locator(".toast-container")).toContainText("Login Successfully");;
+test("User should be able to login with valid credentials and add product to cart", async ({
+  page,
+}) => {
+  const email = "ush@gmail.com";
+  await page.goto("https://rahulshettyacademy.com/client", {
+    waitUntil: "networkidle",
+  });
+  await page.getByPlaceholder("email@example.com").fill(email);
+  await page.getByPlaceholder("enter your passsword").fill("Usha@1234");
 
-    await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: "Login" }).click();
 
-    const productCards = page.locator('.card-body');
+  await expect(page.locator(".toast-container")).toContainText(
+    "Login Successfully",
+  );
 
-    for(let i=0;i < await productCards.count();i++){
-        const title = await productCards.nth(i).locator("h5 b").textContent();
-        if(title?.trim() === "ZARA COAT 3"){
-            await productCards.nth(i).locator("text=Add To Cart").click();
-            break;
-        }
-    }
+  await page.waitForLoadState("networkidle");
+  await page.locator(".card-body b").first().waitFor();
 
-    await page.waitForLoadState("domcontentloaded");
+  await page
+    .locator(".card-body")
+    .filter({ hasText: "ZARA COAT 3" })
+    .getByRole("button", { name: " Add To Cart" })
+    .click();
 
-    await page.locator("[routerLink*='cart']").click();
-    await page.locator("div li").first().waitFor();
+  await page.waitForLoadState("domcontentloaded");
 
-    await expect(page.locator("h3:has-text('ZARA COAT 3')")).toBeVisible();
+  await page
+    .getByRole("listitem")
+    .getByRole("button", { name: "Cart" })
+    .click();
+  await page.locator("div li").first().waitFor();
 
-    await page.locator("text = Checkout").click();
+  await expect(page.getByText("ZARA COAT 3")).toBeVisible();
 
-    await page.locator(".input.txt.text-validated").first().fill("4542 9931 9292 2293");
-    await page.locator("select.input.ddl").first().selectOption("03");
-    await page.locator("select.input.ddl").last().selectOption("30");
-    await page.locator("input.txt").nth(2).fill("123");
-    await page.locator("input.txt").nth(3).fill("Usha");
-    await page.locator("[placeholder='Select Country']").pressSequentially("Ind");
+  await page.getByRole("button", { name: "Checkout" }).click();
 
-    const dropdown = page.locator(".ta-results.list-group.ng-star-inserted");
-    await dropdown.waitFor();
-    let optionsCount = await dropdown.locator("button").count();
+  const getField = (label: string) =>
+    page.locator(`.field:has(.title:has-text("${label}"))`);
 
-    for(let i =0;i<optionsCount;i++){
-        let text = await dropdown.locator("button").nth(i).textContent();
-        if(text === " India"){
-            await dropdown.locator("button").nth(i).click();
-            break;
-        }
-    }
+  await getField("Credit Card Number ")
+    .getByRole("textbox")
+    .fill("4542 9931 9292 2293");
 
-    await expect( page.locator(".user__name [type='text']").first()).toHaveText(email);
+  await getField("Expiry Date")
+    .getByRole("combobox")
+    .first()
+    .selectOption("03");
 
-    await page.locator("text=Place Order ").click();
+  await getField("Expiry Date").getByRole("combobox").nth(1).selectOption("30");
 
-    await expect( page.locator(".hero-primary")).toHaveText(" Thankyou for the order. ");
+  await getField("CVV Code").getByRole("textbox").fill("123");
+  
+  await getField("Name on Card").getByRole("textbox").fill("Usha");
 
-    const orderId = await page.locator(".em-spacer-1 .ng-star-inserted").textContent();
-    console.log(orderId);
+  await page.getByPlaceholder("Select Country").pressSequentially("Ind");
 
-    // to verify order in order history
+await page
+  .locator('.ta-results')
+  .getByRole('button')
+  .filter({ hasText: 'India' })
+  .nth(1)
+  .click();
+
+  await expect(page.getByText("ush@gmail.com")).toHaveText(
+    email,
+  );
+
+  await page.getByText("Place Order").click();
+
+  await expect(page.getByText(" Thankyou for the order. ")).toHaveText(
+    " Thankyou for the order. ",
+  );
+
+  const orderId = await page
+    .locator(".em-spacer-1 .ng-star-inserted")
+    .textContent();
+  console.log(orderId);
+
+  // to verify order in order history
 
     await page.locator("button[routerLink*='myorders']").click();
+
+    await page.getByRole("listitem").getByRole("button", {name: "  ORDERS"}).click();
 
     await page.locator("tbody").waitFor();
 
@@ -72,15 +93,13 @@ test("User should be able to login with valid credentials and add product to car
 
     console.log("Total rows in order history: " + rowCount);
 
-    for(let i=0;i<rowCount;i++){
+    for (let i = 0; i < rowCount; i++) {
         const cellText = await rows.nth(i).locator("th").textContent();
         console.log(cellText);
-        if(orderId && cellText && orderId.includes(cellText)){
-            console.log("Order found in order history");
-            await rows.nth(i).locator("button").first().click();
-            break;
+        if (orderId && cellText && orderId.includes(cellText)) {
+        console.log("Order found in order history");
+        await rows.nth(i).locator("button").first().click();
+        break;
         }
     }
-
-    
-})
+});
