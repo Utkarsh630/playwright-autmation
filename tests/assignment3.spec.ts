@@ -168,7 +168,7 @@ test("Banner IS visible when 6 events are returned", async ({ page }) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(FOUR_EVENTS_RESPONSE),
+        body: JSON.stringify(SIX_EVENTS_RESPONSE  ),
       });
     },
   );
@@ -176,5 +176,11 @@ test("Banner IS visible when 6 events are returned", async ({ page }) => {
   await page.waitForResponse(
     "https://api.eventhub.rahulshettyacademy.com/api/events?*",
   );
-  await page.pause();
+
+// Verify cards loaded from mock
+
+const eventCards = page.getByTestId("event-card");
+expect(await eventCards.first()).toBeVisible();
+  expect(await eventCards.count()).toEqual(6);
+
 });
