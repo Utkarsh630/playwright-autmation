@@ -168,7 +168,7 @@ test("Banner IS visible when 6 events are returned", async ({ page }) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(SIX_EVENTS_RESPONSE  ),
+        body: JSON.stringify(SIX_EVENTS_RESPONSE),
       });
     },
   );
@@ -177,10 +177,41 @@ test("Banner IS visible when 6 events are returned", async ({ page }) => {
     "https://api.eventhub.rahulshettyacademy.com/api/events?*",
   );
 
-// Verify cards loaded from mock
+  // Verify cards loaded from mock
 
-const eventCards = page.getByTestId("event-card");
-expect(await eventCards.first()).toBeVisible();
+  const eventCards = page.getByTestId("event-card");
+  expect(eventCards.first()).toBeVisible();
   expect(await eventCards.count()).toEqual(6);
 
+  // Verify banner is visible
+
+  const banner = page.getByText(/sandbox holds up to/i);
+  await expect(banner).toBeVisible();
+  await expect(banner).toContainText("9 bookings");
+});
+
+test("Banner is NOT visible when 4 events are returned", async ({ page }) => {
+  await page.route(
+    "https://api.eventhub.rahulshettyacademy.com/api/events?*",
+    async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(FOUR_EVENTS_RESPONSE),
+      });
+    },
+  );
+  await loginAndGoToEvents(page);
+  await page.waitForResponse(
+    "https://api.eventhub.rahulshettyacademy.com/api/events?*",
+  );
+
+  const eventCards = page.getByTestId("event-card");
+  expect(eventCards.first()).toBeVisible();
+  expect(await eventCards.count()).toEqual(4);
+
+  // Verify banner is visible
+
+  const banner = page.getByText(/sandbox holds up to/i);
+  await expect(banner).not.toBeVisible();
 });
