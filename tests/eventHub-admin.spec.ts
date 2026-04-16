@@ -73,7 +73,7 @@ async function createGroupBooking(page: Page, numberOfTickets: number) {
 
 async function fillBookingForm(page: Page) {
   await page.locator("#customerName").fill("John sin");
-  await page.locator("#customer-email").fill("john.sin@email.com");
+  await page.locator("#customer-email").fill("john.sing@email.com");
   await page.locator("#phone").fill("9876543210");
 }
 
