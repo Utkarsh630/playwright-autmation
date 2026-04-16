@@ -91,8 +91,6 @@ await page
 
     const rowCount = await rows.count();
 
-    console.log("Total rows in order history: " + rowCount);
-
     for (let i = 0; i < rowCount; i++) {
         const cellText = await rows.nth(i).locator("th").textContent();
         console.log(cellText);

@@ -31,8 +31,6 @@ test("User should be able to login with valid credentials and add product to car
   const rows = page.locator(".table.table-hover tbody tr");
 
   const rowCount = await rows.count();
-
-  console.log("Total rows in order history: " + rowCount);
   let found = false;
   for (let i = 0; i < rowCount; i++) {
     const cellText = await rows.nth(i).locator("th").textContent();
