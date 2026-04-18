@@ -9,4 +9,5 @@ test("Google App launcher", async({page})=>{
     const drive = page.frameLocator("iframe[src*='ogs']").getByRole('link', {name: 'Drive'});
     await expect(drive).toBeVisible();
 
+    await page.screenshot({path: 'landing.png'});
 })

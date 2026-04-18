@@ -101,3 +101,10 @@ await page
         }
     }
 });
+
+test('Visual testing', async ({page})=>{
+   await page.goto("https://rahulshettyacademy.com/client", {
+    waitUntil: "networkidle",
+  });
+  expect(await page.screenshot()).toMatchSnapshot('landing.png');
+})
