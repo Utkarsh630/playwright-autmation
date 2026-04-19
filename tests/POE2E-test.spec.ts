@@ -1,12 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pageObjects/LoginPage";
 import { DashboardPage } from "../pageObjects/DashboardPage";
+import { CartPage } from "../pageObjects/CartPage";
 
 test("User should be able to login with valid credentials and add product to cart", async ({
   page,
 }) => {
   const email = "ush@gmail.com";
   const password = "Usha@1234";
+  const productName= "ZARA COAT 3";
   const loginPage = new LoginPage(page);
   await loginPage.navigateToLoginPage();
   await loginPage.validLogin(email, password);
@@ -23,11 +25,13 @@ test("User should be able to login with valid credentials and add product to car
 
   await dashboardPage.navigateToCart();
   
-  await page.locator("div li").first().waitFor();
+  const cartPage = new CartPage(page);
 
-  await expect(page.getByText("ZARA COAT 3")).toBeVisible();
+  cartPage.waitForCartItemsToLoad();
 
-  await page.getByRole("button", { name: "Checkout" }).click();
+  expect(await cartPage.verifyCartItem(productName)).toBeVisible();
+  await cartPage.checkout();
+
 
   const getField = (label: string) =>
     page.locator(`.field:has(.title:has-text("${label}"))`);
