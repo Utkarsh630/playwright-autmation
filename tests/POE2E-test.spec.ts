@@ -21,7 +21,7 @@ test("User should be able to login with valid credentials and add product to car
 
 
   const dashboardPage = new DashboardPage(page);
-  await dashboardPage.addProductToCart("ZARA COAT 3");
+  await dashboardPage.addProductToCart(productName);
 
   await dashboardPage.navigateToCart();
   
