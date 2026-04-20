@@ -2,105 +2,59 @@ import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pageObjects/LoginPage";
 import { DashboardPage } from "../pageObjects/DashboardPage";
 import { CartPage } from "../pageObjects/CartPage";
+import { CheckoutPage } from "../pageObjects/CheckoutPage";
+import { OrdersPage } from "../pageObjects/OrdersPage";
 
 test("User should be able to login with valid credentials and add product to cart", async ({
   page,
 }) => {
   const email = "ush@gmail.com";
   const password = "Usha@1234";
-  const productName= "ZARA COAT 3";
+  const productName = "ZARA COAT 3";
   const loginPage = new LoginPage(page);
   await loginPage.navigateToLoginPage();
   await loginPage.validLogin(email, password);
 
-  expect(await loginPage.getToastMessage()).toContainText(
+  await expect(loginPage.getToastMessage()).toContainText(
     "Login Successfully",
   );
 
   await page.waitForLoadState("networkidle");
 
-
   const dashboardPage = new DashboardPage(page);
   await dashboardPage.addProductToCart(productName);
 
   await dashboardPage.navigateToCart();
-  
+
   const cartPage = new CartPage(page);
 
-  cartPage.waitForCartItemsToLoad();
+  await cartPage.waitForCartItemsToLoad();
 
-  expect(await cartPage.verifyCartItem(productName)).toBeVisible();
+  await expect(cartPage.verifyCartItem(productName)).toBeVisible();
   await cartPage.checkout();
 
-
-  const getField = (label: string) =>
-    page.locator(`.field:has(.title:has-text("${label}"))`);
-
-  await getField("Credit Card Number ")
-    .getByRole("textbox")
-    .fill("4542 9931 9292 2293");
-
-  await getField("Expiry Date")
-    .getByRole("combobox")
-    .first()
-    .selectOption("03");
-
-  await getField("Expiry Date").getByRole("combobox").nth(1).selectOption("30");
-
-  await getField("CVV Code").getByRole("textbox").fill("123");
-  
-  await getField("Name on Card").getByRole("textbox").fill("Usha");
-
-  await page.getByPlaceholder("Select Country").pressSequentially("Ind");
-
-await page
-  .locator('.ta-results')
-  .getByRole('button')
-  .filter({ hasText: 'India' })
-  .nth(1)
-  .click();
-
-  await expect(page.getByText("ush@gmail.com")).toHaveText(
-    email,
-  );
-
-  await page.getByText("Place Order").click();
-
-  await expect(page.getByText(" Thankyou for the order. ")).toHaveText(
+  const checkoutPage = new CheckoutPage(page);
+  await checkoutPage.enterCreditCardNumber("4542 9931 9292 2293");
+  await checkoutPage.selectExpiryDate("03", "30");
+  await checkoutPage.enterCvvCode("123");
+  await checkoutPage.enterNameOnCard("Usha");
+  await checkoutPage.selectCountry("Ind", "India");
+  await expect(checkoutPage.getUserEmail(email)).toHaveText(email);
+  await checkoutPage.placeOrder();
+  await expect(checkoutPage.getOrderConfirmationMessage()).toHaveText(
     " Thankyou for the order. ",
   );
 
-  const orderId = await page
-    .locator(".em-spacer-1 .ng-star-inserted")
-    .textContent();
+  const orderId = await checkoutPage.getOrderId();
   console.log(orderId);
 
-  // to verify order in order history
-
-    await page.locator("button[routerLink*='myorders']").click();
-
-    await page.getByRole("listitem").getByRole("button", {name: "  ORDERS"}).click();
-
-    await page.locator("tbody").waitFor();
-
-    const rows = page.locator(".table.table-hover tbody tr");
-
-    const rowCount = await rows.count();
-
-    for (let i = 0; i < rowCount; i++) {
-        const cellText = await rows.nth(i).locator("th").textContent();
-        console.log(cellText);
-        if (orderId && cellText && orderId.includes(cellText)) {
-        console.log("Order found in order history");
-        await rows.nth(i).locator("button").first().click();
-        break;
-        }
-    }
+  const ordersPage = new OrdersPage(page);
+  await ordersPage.navigateToOrders();
+  expect(await ordersPage.openOrder(orderId)).toBeTruthy();
 });
 
-test('Visual testing', async ({page})=>{
-   await page.goto("https://rahulshettyacademy.com/client", {
-    waitUntil: "networkidle",
-  });
-  expect(await page.screenshot()).toMatchSnapshot('landing.png');
-})
+test("Visual testing", async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  await loginPage.navigateToLoginPage();
+  expect(await page.screenshot()).toMatchSnapshot("landing.png");
+});

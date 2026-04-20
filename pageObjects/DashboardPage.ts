@@ -23,7 +23,7 @@ export class DashboardPage{
   }
 
     async navigateToCart(){
-        this.cartButton.click();
+        await this.cartButton.click();
     }
 
 }

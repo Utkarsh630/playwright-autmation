@@ -16,7 +16,7 @@ export class CartPage{
 
     }
 
-    async verifyCartItem(productname: string){
+    verifyCartItem(productname: string){
         return this.page.getByText(`${productname}`);
     }
 

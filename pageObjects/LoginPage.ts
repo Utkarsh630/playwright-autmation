@@ -28,10 +28,9 @@ export class LoginPage{
         await this.signInButton.click();
     }
 
-    async getToastMessage(){
+    getToastMessage(){
          return this.toastContainer;
     }
 
 }
-
 
