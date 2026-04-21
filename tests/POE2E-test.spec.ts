@@ -4,10 +4,10 @@ import { DashboardPage } from "../pageObjects/DashboardPage";
 import { CartPage } from "../pageObjects/CartPage";
 import { CheckoutPage } from "../pageObjects/CheckoutPage";
 import { OrdersPage } from "../pageObjects/OrdersPage";
-import data from "../utils/POE2E-TestData.json";
+import dataset from "../utils/POE2E-TestData.json";
+for(const data of dataset){
 const { username, password, productName, checkoutDetails } = data;
-
-test("User should be able to login with valid credentials and add product to cart", async ({
+test(`User should be able to login with valid credentials and add product to cart for ${username}`, async ({
   page,
 }) => {
   const email = username;
@@ -53,6 +53,7 @@ test("User should be able to login with valid credentials and add product to car
   await ordersPage.navigateToOrders();
   expect(await ordersPage.openOrder(orderId)).toBeTruthy();
 });
+}
 
 test("Visual testing", async ({ page }) => {
   const loginPage = new LoginPage(page);

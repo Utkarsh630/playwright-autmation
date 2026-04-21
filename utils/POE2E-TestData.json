@@ -1,12 +1,28 @@
-{
-  "username": "ush@gmail.com",
-  "password": "Usha@1234",
-  "productName": "ZARA COAT 3",
-  "checkoutDetails": {
-    "Name": "Usha",
-    "CardNumber": "4542 9931 9292 2293",
-    "ExpiryMonth": "03",
-    "ExpiryYear": "30",
-    "cvvCode": "123"
+[
+  {
+    "username": "ush@gmail.com",
+    "password": "Usha@1234",
+    "productName": "ZARA COAT 3",
+    "checkoutDetails": {
+      "Name": "Usha",
+      "CardNumber": "4542 9931 9292 2293",
+      "ExpiryMonth": "03",
+      "ExpiryYear": "30",
+      "cvvCode": "123"
+    }
+  },
+
+  {
+    "username": "anshika@gmail.com",
+    "password": "Iamking@000",
+    "productName": "ADIDAS ORIGINAL",
+
+    "checkoutDetails": {
+      "Name": "Anshika",
+      "CardNumber": "4542 9931 9292 2293",
+      "ExpiryMonth": "03",
+      "ExpiryYear": "30",
+      "cvvCode": "567"
+    }
   }
-}
+]
