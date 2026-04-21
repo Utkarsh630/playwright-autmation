@@ -4,16 +4,17 @@ import { DashboardPage } from "../pageObjects/DashboardPage";
 import { CartPage } from "../pageObjects/CartPage";
 import { CheckoutPage } from "../pageObjects/CheckoutPage";
 import { OrdersPage } from "../pageObjects/OrdersPage";
+import data from "../utils/POE2E-TestData.json";
+const { username, password, productName, checkoutDetails } = data;
 
 test("User should be able to login with valid credentials and add product to cart", async ({
   page,
 }) => {
-  const email = "ush@gmail.com";
-  const password = "Usha@1234";
-  const productName = "ZARA COAT 3";
+  const email = username;
+
   const loginPage = new LoginPage(page);
   await loginPage.navigateToLoginPage();
-  await loginPage.validLogin(email, password);
+  await loginPage.validLogin(username, password);
 
   await expect(loginPage.getToastMessage()).toContainText(
     "Login Successfully",
@@ -34,12 +35,12 @@ test("User should be able to login with valid credentials and add product to car
   await cartPage.checkout();
 
   const checkoutPage = new CheckoutPage(page);
-  await checkoutPage.enterCreditCardNumber("4542 9931 9292 2293");
-  await checkoutPage.selectExpiryDate("03", "30");
-  await checkoutPage.enterCvvCode("123");
-  await checkoutPage.enterNameOnCard("Usha");
+  await checkoutPage.enterCreditCardNumber(checkoutDetails.CardNumber);
+  await checkoutPage.selectExpiryDate(checkoutDetails.ExpiryMonth, checkoutDetails.ExpiryYear);
+  await checkoutPage.enterCvvCode(checkoutDetails.cvvCode);
+  await checkoutPage.enterNameOnCard(checkoutDetails.Name);
   await checkoutPage.selectCountry("Ind", "India");
-  await expect(checkoutPage.getUserEmail(email)).toHaveText(email);
+  await expect(checkoutPage.getUserEmail(email)).toHaveText(username);
   await checkoutPage.placeOrder();
   await expect(checkoutPage.getOrderConfirmationMessage()).toHaveText(
     " Thankyou for the order. ",
